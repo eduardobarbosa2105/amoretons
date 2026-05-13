@@ -1,0 +1,1 @@
+import{j as e}from"./index-DwxvYfj0.js";const t=()=>e.jsxs("div",{className:"p-10 max-w-3xl mx-auto",children:[e.jsx("h1",{className:"font-display text-3xl",children:"Análises"}),e.jsx("p",{className:"mt-2 text-muted-foreground",children:"Gráficos, ranking e templates de repertório virão na próxima fase."})]});export{t as component};

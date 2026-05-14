@@ -1,0 +1,171 @@
+@import "tailwindcss" source(none);
+@source "../src";
+@import "tw-animate-css";
+
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,600&family=Inter:wght@300;400;500;600;700&display=swap');
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+  --radius-3xl: calc(var(--radius) + 12px);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-gold: var(--gold);
+  --color-gold-hover: var(--gold-hover);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+}
+
+:root {
+  --radius: 0.75rem;
+
+  /* Brand palette — Amor e Tons (real do Instagram) */
+  --background: oklch(0.16 0.012 45);       /* #1f1411 marrom quase preto */
+  --foreground: oklch(0.86 0.018 55);       /* #daccc3 branco-creme */
+  --surface: oklch(0.20 0.015 45);          /* #291c14 madeira escura */
+  --surface-2: oklch(0.24 0.018 50);        /* tom intermediário */
+
+  --card: oklch(0.20 0.015 45);
+  --card-foreground: oklch(0.86 0.018 55);
+  --popover: oklch(0.20 0.015 45);
+  --popover-foreground: oklch(0.86 0.018 55);
+
+  /* Dourado envelhecido da marca */
+  --gold: oklch(0.70 0.085 78);             /* #b99a63 dourado envelhecido */
+  --gold-hover: oklch(0.78 0.095 80);       /* mais luminoso no hover */
+  --gold-deep: oklch(0.60 0.075 72);        /* #a58552 terroso */
+  --primary: var(--gold);
+  --primary-foreground: oklch(0.16 0.012 45);
+
+  --secondary: oklch(0.26 0.02 50);
+  --secondary-foreground: oklch(0.86 0.018 55);
+
+  --muted: oklch(0.26 0.02 50);
+  --muted-foreground: oklch(0.62 0.025 55); /* creme apagado */
+
+  --accent: var(--gold);
+  --accent-foreground: oklch(0.16 0.012 45);
+
+  --destructive: oklch(0.6 0.22 27);
+  --destructive-foreground: oklch(0.985 0 0);
+  --border: oklch(0.30 0.02 50);            /* moldura sutil */
+  --input: oklch(0.24 0.018 50);
+  --ring: var(--gold);
+
+  --chart-1: var(--gold);
+  --chart-2: oklch(0.5 0 0);
+  --chart-3: oklch(0.7 0 0);
+  --chart-4: oklch(0.4 0 0);
+  --chart-5: oklch(0.85 0 0);
+
+  --sidebar: oklch(0.13 0 0);
+  --sidebar-foreground: oklch(0.97 0 0);
+  --sidebar-primary: var(--gold);
+  --sidebar-primary-foreground: oklch(0.08 0 0);
+  --sidebar-accent: oklch(0.2 0 0);
+  --sidebar-accent-foreground: oklch(0.97 0 0);
+  --sidebar-border: oklch(0.24 0 0);
+  --sidebar-ring: var(--gold);
+
+  --gradient-gold: linear-gradient(135deg, oklch(0.70 0.085 78), oklch(0.78 0.095 80));
+  --gradient-radial-gold: radial-gradient(ellipse at center, oklch(0.70 0.085 78 / 0.14), transparent 60%);
+  --shadow-gold: 0 8px 30px oklch(0.70 0.085 78 / 0.18);
+  --shadow-gold-lg: 0 20px 60px -15px oklch(0.70 0.085 78 / 0.4);
+}
+
+.dark {
+  --background: oklch(0.16 0.012 45);
+  --foreground: oklch(0.86 0.018 55);
+}
+
+@layer base {
+  * { border-color: var(--color-border); }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    font-family: 'Inter', system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .font-display { font-family: 'Playfair Display', Georgia, serif; }
+  .font-sans { font-family: 'Inter', system-ui, sans-serif; }
+
+  .text-gold { color: var(--gold); }
+  .bg-gold { background-color: var(--gold); }
+  .border-gold { border-color: var(--gold); }
+  .bg-surface { background-color: var(--surface); }
+  .bg-surface-2 { background-color: var(--surface-2); }
+
+  .gold-gradient-text {
+    background: var(--gradient-gold);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .radial-gold { background-image: var(--gradient-radial-gold); }
+
+  /* ========== Tema CLARO (painel da banda) ========== */
+  .theme-band {
+    --background: oklch(0.985 0.005 80);
+    --foreground: oklch(0.20 0.01 40);
+    --surface: oklch(1 0 0);
+    --surface-2: oklch(0.96 0.008 75);
+    --card: oklch(1 0 0);
+    --card-foreground: oklch(0.20 0.01 40);
+    --popover: oklch(1 0 0);
+    --popover-foreground: oklch(0.20 0.01 40);
+    --muted: oklch(0.94 0.005 70);
+    --muted-foreground: oklch(0.50 0.015 50);
+    --border: oklch(0.91 0.008 70);
+    --input: oklch(0.94 0.005 70);
+    --primary: oklch(0.55 0.13 55);
+    --primary-foreground: oklch(1 0 0);
+    --accent: oklch(0.94 0.06 80);
+    --accent-foreground: oklch(0.40 0.10 50);
+    --secondary: oklch(0.96 0.008 75);
+    --secondary-foreground: oklch(0.20 0.01 40);
+    --ring: oklch(0.55 0.13 55);
+    --gold: oklch(0.55 0.13 55);
+    --gold-hover: oklch(0.62 0.13 60);
+    color-scheme: light;
+    background-color: var(--background);
+    color: var(--foreground);
+    min-height: 100vh;
+  }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+.btn-shimmer:hover {
+  background-image: linear-gradient(110deg, var(--gold) 30%, var(--gold-hover) 50%, var(--gold) 70%);
+  background-size: 200% 100%;
+  animation: shimmer 1.6s linear infinite;
+}

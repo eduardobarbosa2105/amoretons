@@ -1,0 +1,1 @@
+ALTER TABLE public.events ADD COLUMN IF NOT EXISTS ceremony_type text CHECK (ceremony_type IN ('missa','celebracao'));

@@ -1,31 +1,32 @@
-import { useEffect, useState } from "react";
-import type { Session, User } from "@supabase/supabase-js";
-import { supabase } from "@/integrations/supabase/client";
+import { useState, useEffect } from "react";
+
+const STORAGE_KEY = "band_auth";
+const BAND_PASSWORD = import.meta.env.VITE_BAND_PASSWORD ?? "amoretons2025";
+
+type AuthUser = { email: string };
 
 export function useAuth() {
-  const [session, setSession] = useState<Session | null>(null);
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<AuthUser | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // CRITICAL: subscribe BEFORE getSession
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, s) => {
-      setSession(s);
-      setUser(s?.user ?? null);
-    });
-
-    supabase.auth.getSession().then(({ data: { session: s } }) => {
-      setSession(s);
-      setUser(s?.user ?? null);
-      setLoading(false);
-    });
-
-    return () => subscription.unsubscribe();
+    const stored = localStorage.getItem(STORAGE_KEY);
+    setUser(stored ? (JSON.parse(stored) as AuthUser) : null);
+    setLoading(false);
   }, []);
 
-  const signOut = async () => {
-    await supabase.auth.signOut();
+  const signIn = (password: string): boolean => {
+    if (password !== BAND_PASSWORD) return false;
+    const u: AuthUser = { email: "banda@amoretons.com" };
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(u));
+    setUser(u);
+    return true;
   };
 
-  return { session, user, loading, signOut };
+  const signOut = () => {
+    localStorage.removeItem(STORAGE_KEY);
+    setUser(null);
+  };
+
+  return { user, loading, signIn, signOut };
 }

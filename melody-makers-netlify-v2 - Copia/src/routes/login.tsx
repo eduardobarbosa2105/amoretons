@@ -1,68 +1,40 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Music, ArrowLeft, Loader2 } from "lucide-react";
+import { Music, ArrowLeft, Loader2, Eye, EyeOff } from "lucide-react";
 import { toast } from "sonner";
-import { z } from "zod";
-import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/use-auth";
 
 export const Route = createFileRoute("/login")({
   head: () => ({ meta: [{ title: "Entrar — Amor e Tons" }] }),
   component: LoginPage,
 });
 
-const loginSchema = z.object({
-  email: z.string().trim().email("E-mail inválido").max(255),
-  password: z.string().min(6, "Mínimo 6 caracteres").max(72),
-});
-const signupSchema = loginSchema.extend({
-  full_name: z.string().trim().min(2, "Informe seu nome").max(100),
-});
-
 function LoginPage() {
   const navigate = useNavigate();
-  const [mode, setMode] = useState<"login" | "signup">("login");
-  const [loading, setLoading] = useState(false);
-  const [form, setForm] = useState({ email: "", password: "", full_name: "" });
+  const { user, loading, signIn } = useAuth();
+  const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session) navigate({ to: "/dashboard" });
-    });
-  }, [navigate]);
+    if (!loading && user) navigate({ to: "/dashboard" });
+  }, [loading, user, navigate]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
-    try {
-      if (mode === "login") {
-        const parsed = loginSchema.parse(form);
-        const { error } = await supabase.auth.signInWithPassword(parsed);
-        if (error) throw error;
-        toast.success("Bem-vindo de volta!");
-        navigate({ to: "/dashboard" });
-      } else {
-        const parsed = signupSchema.parse(form);
-        const { error } = await supabase.auth.signUp({
-          email: parsed.email,
-          password: parsed.password,
-          options: {
-            emailRedirectTo: `${window.location.origin}/dashboard`,
-            data: { full_name: parsed.full_name },
-          },
-        });
-        if (error) throw error;
-        toast.success("Conta criada! Entrando...");
-        navigate({ to: "/dashboard" });
-      }
-    } catch (err: unknown) {
-      const msg = err instanceof z.ZodError
-        ? err.issues[0]?.message
-        : err instanceof Error ? err.message : "Erro inesperado";
-      toast.error(msg);
-    } finally {
-      setLoading(false);
+    setSubmitting(true);
+    const ok = signIn(password);
+    setSubmitting(false);
+    if (ok) {
+      toast.success("Bem-vindo!");
+      navigate({ to: "/dashboard" });
+    } else {
+      toast.error("Senha incorreta");
+      setPassword("");
     }
   };
+
+  if (loading) return null;
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center px-6 relative">
@@ -81,53 +53,37 @@ function LoginPage() {
           Área da <span className="italic gold-gradient-text">banda</span>
         </h1>
         <p className="text-center text-sm text-muted-foreground mt-2">
-          {mode === "login" ? "Acesse o painel de gerenciamento" : "Crie sua conta de músico"}
+          Acesso restrito aos músicos da banda
         </p>
 
-        <div className="mt-8 flex p-1 rounded-full bg-surface border border-border">
-          <button onClick={() => setMode("login")}
-            className={`flex-1 py-2 rounded-full text-xs uppercase tracking-widest transition ${mode === "login" ? "bg-gold text-primary-foreground" : "text-muted-foreground"}`}>
-            Entrar
-          </button>
-          <button onClick={() => setMode("signup")}
-            className={`flex-1 py-2 rounded-full text-xs uppercase tracking-widest transition ${mode === "signup" ? "bg-gold text-primary-foreground" : "text-muted-foreground"}`}>
-            Criar conta
-          </button>
-        </div>
-
-        <form onSubmit={handleSubmit} className="mt-6 space-y-3">
-          {mode === "signup" && (
+        <form onSubmit={handleSubmit} className="mt-10 space-y-4">
+          <div className="relative">
             <input
               required
-              placeholder="Seu nome completo"
-              value={form.full_name}
-              onChange={(e) => setForm({ ...form, full_name: e.target.value })}
-              className="w-full px-5 py-4 rounded-xl bg-surface border border-border focus:border-gold focus:outline-none text-foreground placeholder:text-muted-foreground"
+              type={showPassword ? "text" : "password"}
+              placeholder="Senha de acesso"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full px-5 py-4 pr-12 rounded-xl bg-surface border border-border focus:border-gold focus:outline-none text-foreground placeholder:text-muted-foreground"
             />
-          )}
-          <input
-            required type="email" placeholder="E-mail"
-            value={form.email}
-            onChange={(e) => setForm({ ...form, email: e.target.value })}
-            className="w-full px-5 py-4 rounded-xl bg-surface border border-border focus:border-gold focus:outline-none text-foreground placeholder:text-muted-foreground"
-          />
-          <input
-            required type="password" placeholder="Senha (mín. 6 caracteres)"
-            value={form.password}
-            onChange={(e) => setForm({ ...form, password: e.target.value })}
-            className="w-full px-5 py-4 rounded-xl bg-surface border border-border focus:border-gold focus:outline-none text-foreground placeholder:text-muted-foreground"
-          />
+            <button
+              type="button"
+              onClick={() => setShowPassword((v) => !v)}
+              className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-gold transition"
+            >
+              {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+            </button>
+          </div>
 
-          <button type="submit" disabled={loading}
-            className="w-full inline-flex items-center justify-center gap-2 px-6 py-4 rounded-full bg-gold text-primary-foreground text-sm font-medium tracking-wider uppercase btn-shimmer disabled:opacity-60">
-            {loading && <Loader2 className="w-4 h-4 animate-spin" />}
-            {mode === "login" ? "Entrar" : "Criar conta"}
+          <button
+            type="submit"
+            disabled={submitting || !password}
+            className="w-full inline-flex items-center justify-center gap-2 px-6 py-4 rounded-full bg-gold text-primary-foreground text-sm font-medium tracking-wider uppercase btn-shimmer disabled:opacity-60"
+          >
+            {submitting && <Loader2 className="w-4 h-4 animate-spin" />}
+            Entrar
           </button>
         </form>
-
-        <p className="mt-6 text-center text-xs text-muted-foreground">
-          Acesso restrito aos músicos da banda.
-        </p>
       </div>
     </div>
   );

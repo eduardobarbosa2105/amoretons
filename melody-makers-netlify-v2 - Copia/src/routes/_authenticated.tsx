@@ -23,18 +23,31 @@ const VIEW_NAV = [
 ];
 
 function AuthenticatedLayout() {
-  const { user, signOut } = useAuth();
+  const { user, loading, signOut } = useAuth();
   const navigate = useNavigate();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
 
-  // DEV MODE: acesso liberado sem login para desenvolvimento
-  const devUser = user ?? { email: "dev@amoretons.local" };
+  useEffect(() => {
+    if (!loading && !user) {
+      navigate({ to: "/login" });
+    }
+  }, [loading, user, navigate]);
 
   const handleSignOut = async () => {
     await signOut();
     toast.success("Sessão encerrada");
     navigate({ to: "/login" });
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <Loader2 className="w-6 h-6 animate-spin text-gold" />
+      </div>
+    );
+  }
+
+  if (!user) return null;
 
   return (
     <div className="theme-band min-h-screen flex">
@@ -98,7 +111,7 @@ function AuthenticatedLayout() {
 
         <div className="p-3 border-t border-border">
           <div className="px-3 py-2 text-xs">
-            <div className="text-foreground truncate">{devUser.email}</div>
+            <div className="text-foreground truncate">{user.email}</div>
           </div>
           <button onClick={handleSignOut}
             className="w-full mt-1 flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-foreground/80 hover:bg-muted">
